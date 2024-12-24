@@ -1,0 +1,697 @@
+{
+"lab" : {
+    "hosts" : {
+        "dc01" : {
+            "hostname" : "testercomp",
+            "type" : "dc",
+            "local_admin_password": "8dCT-DJjgScp",
+            "domain" : "programmers.kzi",
+            "path" : "DC=programmers,DC=kzi",
+            "local_groups" : {
+                "Administrators" : [
+                    "programmers\\robert.baratheon",
+                    "programmers\\cersei.lannister",
+                    "programmers\\DragonRider"
+                ],
+                "Remote Desktop Users" : [
+                    "programmers\\Small Council",
+                    "programmers\\Baratheon"
+                ]
+            },
+            "scripts" : ["sidhistory.ps1"],
+            "vulns" : ["disable_firewall"],
+            "security": ["account_is_sensitive"],
+            "security_vars": {
+                "account_is_sensitive" : { "renly": {"account" : "renly.baratheon"} }
+            }
+        },
+        "ws01" : {
+            "hostname" : "casterlyrock",
+            "type" : "workstation",
+            "local_admin_password": "EP+xh7Rk6j90",
+            "domain" : "programmers.kzi",
+            "path" : "DC=programmers,DC=kzi",
+            "local_groups" : {
+                "Administrators" : [
+                    "programmers\\tywin.lannister",
+                    "programmers\\jaime.lannister"
+                ]
+            },
+            "Remote Desktop Users" : [
+                "programmers\\Lanister"
+            ],
+            "scripts" : [],
+            "vulns" : ["disable_firewall"]
+        },
+        "dc02" : {
+            "hostname" : "programmercomp",
+            "type" : "dc",
+            "local_admin_password": "NgtI75cKV+Pu",
+            "domain" : "testers.programmers.kzi",
+            "path" : "DC=testers,DC=programmers,DC=kzi",
+            "local_groups" : {
+                "Administrators" : [
+                    "testers\\eddard.stark",
+                    "testers\\catelyn.stark",
+                    "testers\\robb.stark"
+                ],
+                "Remote Desktop Users" : [
+                    "testers\\Stark"
+                ]
+            },
+            "scripts" : [
+                "asrep_roasting.ps1",
+                "constrained_delegation_use_any.ps1",
+                "constrained_delegation_kerb_only.ps1",
+                "ntlm_relay.ps1",
+                "responder.ps1",
+                "gpo_abuse.ps1",
+                "rdp_scheduler.ps1",
+                "unconstrained_delegation_user.ps1"
+            ],
+            "vulns" : ["disable_firewall","directory", "credentials", "autologon", "files", "enable_llmnr", "enable_nbt-ns", "shares"],
+            "vulns_vars" : {
+                "directory": {
+                    "setup": "c:\\setup"
+                },
+                "credentials" : {
+                    "TERMSRV/programmerserver": {
+                        "username" : "testers\\robb.stark",
+                        "secret"   : "sexywolfy",
+                        "runas"    : "testers\\robb.stark",
+                        "runas_password" : "sexywolfy"
+                    }
+                },
+                "autologon" : {
+                    "robb.stark" : {
+                        "username" : "testers\\robb.stark",
+                        "password" : "sexywolfy"
+                    }
+                },
+                "files" : {
+                    "rdp" : {
+                        "src" : "dc02/bot_rdp.ps1",
+                        "dest" : "c:\\setup\\bot_rdp.ps1"
+                    },
+                    "sysvol_fake_script": {
+                        "src" : "dc02/sysvol_scripts/script.ps1",
+                        "dest": "C:\\Windows\\SYSVOL\\domain\\scripts\\script.ps1"
+                    },
+                    "sysvol_secret": {
+                        "src" : "dc02/sysvol_scripts/secret.ps1",
+                        "dest": "C:\\Windows\\SYSVOL\\domain\\scripts\\secret.ps1"
+                    }
+                }
+            }
+        },
+        "srv02" : {
+            "hostname" : "programmerserver",
+            "type" : "server",
+            "local_admin_password": "NgtI75cKV+Pu",
+            "domain" : "testers.programmers.kzi",
+            "path" : "DC=testers,DC=programmers,DC=kzi",
+            "use_laps": false,
+            "local_groups" : {
+                "Administrators" : [
+                    "testers\\jeor.mormont"
+                ],
+                "Remote Desktop Users" : [
+                    "testers\\Night Watch",
+                    "testers\\Mormont",
+                    "testers\\Stark"
+                ]
+            },
+            "scripts" : [],
+            "vulns" : ["directory", "disable_firewall", "openshares", "files", "permissions"],
+            "vulns_vars" : {
+                "directory": {
+                    "shares": "C:\\shares",
+                    "all": "C:\\shares\\all"
+                },
+                "files" : {
+                    "website" : {
+                        "src" : "srv02/wwwroot",
+                        "dest" : "C:\\inetpub\\"
+                    },
+                    "letter_in_shares": {
+                        "src" : "srv02/all/arya.txt",
+                        "dest": "C:\\shares\\all\\arya.txt"
+                    }
+                },
+                "permissions" : {
+                    "IIS_IUSRS_upload": {
+                        "path" : "C:\\inetpub\\wwwroot\\upload",
+                        "user" : "IIS_IUSRS",
+                        "rights" : "FullControl"
+                    }
+                }
+            },
+            "mssql":{
+                "sa_password": "Sup1_sa_P@ssw0rd!",
+                "svcaccount" : "sql_svc",
+                "sysadmins" : [
+                    "testers\\jon.snow"
+                ],
+                "executeaslogin" : {
+                    "testers\\samwell.tarly" : "sa",
+                    "testers\\brandon.stark" :  "testers\\jon.snow"
+                },
+                "executeasuser" : {
+                    "arya_master_dbo": {
+                        "user": "testers\\arya.stark",
+                        "db"  : "master",
+                        "impersonate" : "dbo"
+                    },
+                    "arya_dbms_dbo": {
+                        "user": "testers\\arya.stark",
+                        "db"  : "msdb",
+                        "impersonate" : "dbo"
+                    }
+                },
+                "linked_servers": {
+                    "adminserver" : {
+                        "data_src": "adminserver.admins.kzi",
+                        "users_mapping": [
+                            {"local_login": "testers\\jon.snow","remote_login": "sa", "remote_password": "sa_P@ssw0rd!Ess0s"}
+                        ]
+                    }
+                }
+            }
+        },
+        "dc03" : {
+            "hostname" : "admincomp",
+            "type" : "dc",
+            "local_admin_password": "Ufe-bVXSx9rk",
+            "domain" : "admins.kzi",
+            "path" : "DC=admins,DC=kzi",
+            "local_groups" : {
+                "Administrators" : [
+                    "admins\\daenerys.targaryen"
+                ],
+                "Remote Desktop Users" : [
+                    "admins\\Targaryen"
+                ]
+            },
+            "scripts" : ["asrep_roasting2.ps1"],
+            "vulns" : ["ntlmdowngrade", "disable_firewall"]
+        },
+        "srv03" : {
+            "hostname" : "adminserver",
+            "type" : "server",
+            "local_admin_password": "978i2pF43UJ-",
+            "domain" : "admins.kzi",
+            "path" : "DC=admins,DC=kzi",
+            "use_laps": true,
+            "local_groups" : {
+                "Administrators" : [
+                    "admins\\khal.drogo"
+                ]
+            },
+            "Remote Desktop Users" : [
+                "admins\\Dothraki"
+            ],
+            "scripts" : [],
+            "vulns" : ["openshares","disable_firewall"],
+            "security": ["enable_run_as_ppl"],
+            "mssql":{
+                "sa_password": "sa_P@ssw0rd!Ess0s",
+                "svcaccount" : "sql_svc",
+                "sysadmins" : [
+                    "admins\\khal.drogo"
+                ],
+                "executeaslogin" : {
+                    "admins\\jorah.mormont" : "sa"
+                },
+                "executeasuser" : {},
+                "linked_servers": {
+                    "programmerserver" : {
+                        "data_src": "programmerserver.testers.programmers.kzi",
+                        "users_mapping": [
+                            {"local_login": "admins\\khal.drogo","remote_login": "sa", "remote_password": "Sup1_sa_P@ssw0rd!"}
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "domains" : {
+        "admins.kzi" : {
+            "dc": "dc03",
+            "domain_password" : "Ufe-bVXSx9rk",
+            "netbios_name": "admins",
+            "ca_server": "adminserver",
+            "trust" : "programmers.kzi",
+            "laps_path": "OU=Laps,DC=admins,DC=kzi",
+            "organisation_units" : {
+            },
+            "laps_readers": [
+                "jorah.mormont",
+                "Spys"
+            ],
+            "groups" : {
+                "universal" : {},
+                "global" : {
+                    "Targaryen" : {
+                        "managed_by" : "viserys.targaryen",
+                        "path" : "CN=Users,DC=admins,DC=kzi"
+                    },
+                    "Dothraki" : {
+                        "managed_by" : "khal.drogo",
+                        "path" : "CN=Users,DC=admins,DC=kzi"
+                    },
+                    "Dragons":{
+                        "managed_by" : "Administrator",
+                        "path" : "CN=Users,DC=admins,DC=kzi"
+                    },
+                    "QueenProtector":{
+                        "managed_by" : "Administrator",
+                        "path" : "CN=Users,DC=admins,DC=kzi",
+                        "members" : ["admins\\Dragons"]
+                    },
+                    "Domain Admins":{
+                        "managed_by" : "Administrator",
+                        "path" : "CN=Users,DC=admins,DC=kzi",
+                        "members" : ["admins\\QueenProtector"]
+                    }
+                },
+                "domainlocal" : {
+                    "DragonsFriends" : {
+                        "managed_by" : "daenerys.targaryen",
+                        "path" : "CN=Users,DC=admins,DC=kzi"
+                    },
+                    "Spys" : {
+                        "path" : "CN=Users,DC=admins,DC=kzi"
+                    }
+                }
+            },
+            "multi_domain_groups_member" : {
+                "DragonsFriends" : [
+                    "programmers.kzi\\tyron.lannister",
+                    "admins.kzi\\daenerys.targaryen"
+                ],
+                "Spys" : [
+                    "programmers.kzi\\Small Council"
+                ]
+            },
+            "gmsa" : {
+                "gmsa_account": {
+                    "gMSA_Name" : "gmsaDragon",
+                    "gMSA_FQDN" : "gmsaDragon.admins.kzi",
+                    "gMSA_SPNs" : ["HTTP/adminserver", "HTTP/adminserver.admins.kzi"],
+                    "gMSA_HostNames" : ["adminserver"]
+                }
+            },
+            "acls" : {
+                "GenericAll_khal_viserys" : {"for": "khal.drogo", "to": "viserys.targaryen", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_spy_jorah" : {"for": "Spys", "to": "jorah.mormont", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_khal_esc4" : {"for": "khal.drogo", "to": "CN=ESC4,CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=admins,DC=kzi", "right": "GenericAll", "inheritance": "None"},
+                "WriteProperty_petyer_domadmin" : {"for": "viserys.targaryen", "to": "jorah.mormont", "right": "WriteProperty", "inheritance": "All"},
+                "GenericWrite_DragonsFriends_adminserver" : {"for": "DragonsFriends", "to": "braavoos$", "right": "GenericWrite", "inheritance": "None"},
+                "GenericAll_missandei_khal" : {"for": "missandei", "to": "khal.drogo", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_gmsaDragon_drogo" : {"for": "gmsaDragon$", "to": "drogon", "right": "GenericAll", "inheritance": "None"}
+            },
+            "users" : {
+                "daenerys.targaryen" : {
+                    "firstname"   : "daenerys",
+                    "surname"     : "targaryen",
+                    "password"    : "BurnThemAll!", 
+                    "city"        : "-",
+                    "description" : "Darnerys Targaryen",
+                    "groups"      : ["Targaryen", "Domain Admins"],
+                    "path"        : "CN=Users,DC=admins,DC=kzi"
+                },
+                "viserys.targaryen" : {
+                    "firstname"   : "viserys",
+                    "surname"     : "targaryen",
+                    "password"    : "GoldCrown",
+                    "city"        : "-",
+                    "description" : "Viserys Targaryen",
+                    "groups"      : ["Targaryen"],
+                    "path"        : "CN=Users,DC=admins,DC=kzi"
+                },
+                "khal.drogo" : {
+                    "firstname"   : "khal",
+                    "surname"     : "drogo",
+                    "password"    : "horse",
+                    "city"        : "-",
+                    "description" : "Khal Drogo",
+                    "groups"      : ["Dothraki"],
+                    "path"        : "CN=Users,DC=admins,DC=kzi"
+                },
+                "jorah.mormont" : {
+                    "firstname"   : "jorah",
+                    "surname"     : "mormont",
+                    "password"    : "H0nnor!",
+                    "city"        : "-",
+                    "description" : "Jorah Mormont",
+                    "groups"      : ["Targaryen"],
+                    "path"        : "CN=Users,DC=admins,DC=kzi"
+                },
+                "missandei" : {
+                    "firstname"   : "missandei",
+                    "surname"     : "-",
+                    "password"    : "fr3edom",
+                    "city"        : "-",
+                    "description" : "missandei",
+                    "groups"      : [],
+                    "path"        : "CN=Users,DC=admins,DC=kzi"
+                },
+                "drogon" : {
+                    "firstname"   : "drogon",
+                    "surname"     : "-",
+                    "password"    : "Dracarys",
+                    "city"        : "-",
+                    "description" : "drogon",
+                    "groups"      : ["Dragons"],
+                    "path"        : "CN=Users,DC=admins,DC=kzi"
+                },
+                "sql_svc" : {
+                    "firstname"   : "sql",
+                    "surname"     : "service",
+                    "password"    : "YouWillNotKerboroast1ngMeeeeee",
+                    "city"        : "-",
+                    "description" : "sql service",
+                    "groups"      : [],
+                    "path"        : "CN=Users,DC=admins,DC=kzi",
+                    "spns"        : ["MSSQLSvc/adminserver.admins.kzi:1433","MSSQLSvc/adminserver.admins.kzi"]
+                }
+            }
+        },
+        "testers.programmers.kzi" : {
+            "dc": "dc02",
+            "domain_password" : "NgtI75cKV+Pu",
+            "netbios_name": "testers",
+            "trust" : "",
+            "laps_path": "OU=Laps,DC=testers,DC=programmers,DC=kzi",
+            "organisation_units" : {
+            },
+            "groups" : {
+                "universal" : {},
+                "global" : {
+                    "Stark" : {
+                        "managed_by" : "eddard.stark",
+                        "path" : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                    },
+                    "Night Watch" : {
+                        "managed_by" : "jeor.mormont",
+                        "path" : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                    },
+                    "Mormont" : {
+                        "managed_by" : "jeor.mormont",
+                        "path" : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                    }
+                },
+                "domainlocal" : {
+                    "AcrossTheSea" : {
+                        "path" : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                    }
+                }
+            },
+            "multi_domain_groups_member" : {},
+            "acls" : {
+                "anonymous_rpc" : {"for": "NT AUTHORITY\\ANONYMOUS LOGON", "to": "DC=testers,DC=programmers,DC=kzi", "right": "ReadProperty", "inheritance": "All"},
+                "anonymous_rpc2" : {"for": "NT AUTHORITY\\ANONYMOUS LOGON", "to": "DC=testers,DC=programmers,DC=kzi", "right": "GenericExecute", "inheritance": "All"}
+            },
+            "users" : {
+                "arya.stark" : {
+                    "firstname"   : "Arya",
+                    "surname"     : "Stark",
+                    "password"    : "Needle",
+                    "city"        : "programmercomp",
+                    "description" : "Arya Stark",
+                    "groups"      : ["Stark"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "eddard.stark" : {
+                    "firstname"   : "Eddard",
+                    "surname"     : "Stark",
+                    "password"    : "FightP3aceAndHonor!",
+                    "city"        : "King's Landing",
+                    "description" : "Eddard Stark",
+                    "groups"      : ["Stark", "Domain Admins"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "catelyn.stark" : {
+                    "firstname"   : "Catelyn",
+                    "surname"     : "Stark",
+                    "password"    : "robbsansabradonaryarickon",
+                    "city"        : "King's Landing",
+                    "description" : "Catelyn Stark",
+                    "groups"      : ["Stark"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "robb.stark" : {
+                    "firstname"   : "Robb",
+                    "surname"     : "Stark",
+                    "password"    : "sexywolfy",
+                    "city"        : "programmercomp",
+                    "description" : "Robb Stark",
+                    "groups"      : ["Stark"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "sansa.stark" : {
+                    "firstname"   : "Sansa",
+                    "surname"     : "Stark",
+                    "password"    : "345ertdfg",
+                    "city"        : "programmercomp",
+                    "description" : "Sansa Stark",
+                    "groups"      : ["Stark"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi",
+                    "spns"        : ["HTTP/eyrie.testers.programmers.kzi"]
+                },
+                "brandon.stark" : {
+                    "firstname"   : "Brandon",
+                    "surname"     : "Stark",
+                    "password"    : "iseedeadpeople",
+                    "city"        : "programmercomp",
+                    "description" : "Brandon Stark",
+                    "groups"      : ["Stark"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "rickon.stark" : {
+                    "firstname"   : "Rickon",
+                    "surname"     : "Stark",
+                    "password"    : "Winter2022",
+                    "city"        : "programmercomp",
+                    "description" : "Rickon Stark",
+                    "groups"      : ["Stark"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "hodor" : {
+                    "firstname"   : "hodor",
+                    "surname"     : "hodor",
+                    "password"    : "hodor",
+                    "city"        : "programmercomp",
+                    "description" : "Brainless Giant",
+                    "groups"      : ["Stark"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "jon.snow" : {
+                    "firstname"   : "Jon",
+                    "surname"     : "Snow",
+                    "password"    : "iknownothing",
+                    "city"        : "Castel Black",
+                    "description" : "Jon Snow",
+                    "groups"      : ["Stark", "Night Watch"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi",
+                    "spns"        : ["HTTP/thewall.testers.programmers.kzi"]
+                },
+                "samwell.tarly" : {
+                    "firstname"   : "Samwell",
+                    "surname"     : "Tarly",
+                    "password"    : "Heartsbane",
+                    "city"        : "Castel Black",
+                    "description" : "Samwell Tarly (Password : Heartsbane)",
+                    "groups"      : ["Night Watch"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "jeor.mormont" : {
+                    "firstname"   : "Jeor",
+                    "surname"     : "Mormont",
+                    "password"    : "_L0ngCl@w_",
+                    "city"        : "Castel Black",
+                    "description" : "Jeor Mormont",
+                    "groups"      : ["Night Watch", "Mormont"],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
+                },
+                "sql_svc" : {
+                    "firstname"   : "sql",
+                    "surname"     : "service",
+                    "password"    : "YouWillNotKerboroast1ngMeeeeee",
+                    "city"        : "-",
+                    "description" : "sql service",
+                    "groups"      : [],
+                    "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi",
+                    "spns"        : ["MSSQLSvc/programmerserver.testers.programmers.kzi:1433","MSSQLSvc/programmerserver.testers.programmers.kzi"]
+                }
+            }
+        },
+        "programmers.kzi" : {
+            "dc": "dc01",
+            "domain_password" : "8dCT-DJjgScp",
+            "netbios_name": "programmers",
+            "trust" : "admins.kzi",
+            "laps_path": "OU=Laps,DC=programmers,DC=kzi",
+            "organisation_units" : {
+                "Vale"        : { "path" : "DC=programmers,DC=kzi"},
+                "IronIslands" : { "path" : "DC=programmers,DC=kzi"},
+                "Riverlands"  : { "path" : "DC=programmers,DC=kzi"},
+                "Crownlands"  : { "path" : "DC=programmers,DC=kzi"},
+                "Stormlands"  : { "path" : "DC=programmers,DC=kzi"},
+                "Westerlands" : { "path" : "DC=programmers,DC=kzi"},
+                "Reach"       : { "path" : "DC=programmers,DC=kzi"},
+                "Dorne"       : { "path" : "DC=programmers,DC=kzi"}
+            },
+            "groups" : {
+                "universal" : {},
+                "global" : {
+                    "Lannister" : {
+                        "managed_by" : "tywin.lannister",
+                        "path" : "OU=Westerlands,DC=programmers,DC=kzi"
+                    },
+                    "Baratheon" : {
+                        "managed_by" : "robert.baratheon",
+                        "path" : "OU=Stormlands,DC=programmers,DC=kzi"
+                    },
+                    "Small Council" : {
+                        "path" : "OU=Crownlands,DC=programmers,DC=kzi"
+                    },
+                    "DragonStone" : {
+                        "path" : "OU=Crownlands,DC=programmers,DC=kzi"
+                    },
+                    "KingsGuard" : {
+                        "path" : "OU=Crownlands,DC=programmers,DC=kzi"
+                    },
+                    "DragonRider" : {
+                        "path" : "OU=Crownlands,DC=programmers,DC=kzi"
+                    }
+                },
+                "domainlocal" : {
+                    "AcrossTheNarrowSea" : {
+                        "path" : "CN=Users,DC=programmers,DC=kzi"
+                    }
+                }
+            },
+            "multi_domain_groups_member" : {
+                "AcrossTheNarrowSea" : [
+                    "admins.kzi\\daenerys.targaryen"
+                ]
+            },
+            "acls" : {
+                "forcechangepassword_tywin_jaime" : {"for": "tywin.lannister", "to": "jaime.lannister", "right": "Ext-User-Force-Change-Password", "inheritance": "None"},
+                "GenericWrite_on_user_jaimie_joffrey" : {"for": "jaime.lannister", "to": "joffrey.baratheon", "right": "GenericWrite", "inheritance": "None"},
+                "Writedacl_joffrey_tyron" : {"for": "joffrey.baratheon", "to": "tyron.lannister", "right": "WriteDacl", "inheritance": "None"},
+                "self-self-membership-on-group_tyron_small_council" : {"for": "tyron.lannister", "to": "Small Council", "right": "Ext-Self-Self-Membership", "inheritance": "None"},
+                "addmember_smallcouncil_DragonStone" : {"for": "Small Council", "to": "DragonStone", "right": "Ext-Write-Self-Membership", "inheritance": "All"},
+                "write_owner_dragonstone_kingsguard" : {"for": "DragonStone", "to": "KingsGuard", "right": "WriteOwner", "inheritance": "None"},
+                "GenericAll_kingsguard_stanis" : {"for": "KingsGuard", "to": "stannis.baratheon", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_stanis_dc" : {"for": "stannis.baratheon", "to": "testercomp$", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_group_acrrosdom_dc" : {"for": "AcrossTheNarrowSea", "to": "testercomp$", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_varys_domadmin" : {"for": "lord.varys", "to": "Domain Admins", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_varys_domadmin_holder" : {"for": "lord.varys", "to": "CN=AdminSDHolder,CN=System,DC=programmers,DC=kzi", "right": "GenericAll", "inheritance": "None"},
+                "WriteDACL_renly_Crownlands" : {"for": "renly.baratheon", "to": "OU=Crownlands,DC=programmers,DC=kzi", "right": "WriteDacl", "inheritance": "None"}
+            },
+            "users" : {
+                "tywin.lannister" : {
+                    "firstname"   : "Tywin",
+                    "surname"     : "Lanister",
+                    "password"    : "powerkingftw135",
+                    "city"        : "Casterly Rock",
+                    "description" : "Tywin Lanister",
+                    "groups"      : ["Lannister"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "jaime.lannister" : {
+                    "firstname"   : "Jaime",
+                    "surname"     : "Lanister",
+                    "password"    : "cersei",
+                    "city"        : "King's Landing",
+                    "description" : "Jaime Lanister",
+                    "groups"      : ["Lannister"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "cersei.lannister" : {
+                    "firstname"   : "Cersei",
+                    "surname"     : "Lanister",
+                    "password"    : "il0vejaime",
+                    "city"        : "King's Landing",
+                    "description" : "Cersei Lanister",
+                    "groups"      : ["Lannister","Baratheon","Domain Admins","Small Council"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "tyron.lannister" : {
+                    "firstname"   : "Tyron",
+                    "surname"     : "Lanister",
+                    "password"    : "Alc00L&S3x",
+                    "city"        : "King's Landing",
+                    "description" : "Tyron Lanister",
+                    "groups"      : ["Lannister"],
+                    "path"        : "OU=Westerlands,DC=programmers,DC=kzi"
+                },
+                "robert.baratheon" : {
+                    "firstname"   : "Robert",
+                    "surname"     : "Baratheon",
+                    "password"    : "iamthekingoftheworld",
+                    "city"        : "King's Landing",
+                    "description" : "Robert Lanister",
+                    "groups"      : ["Baratheon","Domain Admins","Small Council","Protected Users"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "joffrey.baratheon" : {
+                    "firstname"   : "Joffrey",
+                    "surname"     : "Baratheon",
+                    "password"    : "1killerlion",
+                    "city"        : "King's Landing",
+                    "description" : "Joffrey Baratheon",
+                    "groups"      : ["Baratheon","Lannister"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "renly.baratheon" : {
+                    "firstname"   : "Renly",
+                    "surname"     : "Baratheon",
+                    "password"    : "lorastyrell",
+                    "city"        : "King's Landing",
+                    "description" : "Renly Baratheon",
+                    "groups"      : ["Baratheon","Small Council"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "stannis.baratheon" : {
+                    "firstname"   : "Stannis",
+                    "surname"     : "Baratheon",
+                    "password"    : "Drag0nst0ne",
+                    "city"        : "King's Landing",
+                    "description" : "Stannis Baratheon",
+                    "groups"      : ["Baratheon","Small Council"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "petyer.baelish" : {
+                    "firstname"   : "Petyer",
+                    "surname"     : "Baelish",
+                    "password"    : "@littlefinger@",
+                    "city"        : "King's Landing",
+                    "description" : "Petyer Baelish",
+                    "groups"      : ["Small Council"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "lord.varys" : {
+                    "firstname"   : "Lord",
+                    "surname"     : "Varys",
+                    "password"    : "_W1sper_$",
+                    "city"        : "King's Landing",
+                    "description" : "Lord Varys",
+                    "groups"      : ["Small Council"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                },
+                "maester.pycelle" : {
+                    "firstname"   : "Maester",
+                    "surname"     : "Pycelle",
+                    "password"    : "MaesterOfMaesters",
+                    "city"        : "King's Landing",
+                    "description" : "Maester Pycelle",
+                    "groups"      : ["Small Council"],
+                    "path"        : "OU=Crownlands,DC=programmers,DC=kzi"
+                }
+            }
+        }
+    }
+}}
