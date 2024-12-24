@@ -1,1 +1,1 @@
-netdom trust sevenkingdoms.local /d:essos.local /enablesidhistory:yes
+netdom trust programmers.kzi /d:admins.kzi /enablesidhistory:yes
