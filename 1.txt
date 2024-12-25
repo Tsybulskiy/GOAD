@@ -1,0 +1,23 @@
+import os
+
+# Список искомых слов
+keywords = ["sevenkingdoms", "north", "castleback", "winterfell", "meeren", "essos", "kingslanding","bravoos","https://github.com/Orange-Cyberdefense/GOAD"]
+
+# Рекурсивная функция для поиска слов
+def search_files_in_directory(directory):
+    for root, _, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            try:
+                # Открываем файл и читаем содержимое
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                    # Проверяем, есть ли в содержимом файла хотя бы одно из слов
+                    if any(keyword in content for keyword in keywords):
+                        print(f"Найдено в файле: {file_path}")
+            except Exception as e:
+                print(f"Ошибка при чтении файла {file_path}: {e}")
+
+# Запуск поиска в текущей директории
+current_directory = os.getcwd()
+search_files_in_directory(current_directory)
