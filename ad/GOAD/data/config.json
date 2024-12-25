@@ -2,7 +2,7 @@
 "lab" : {
     "hosts" : {
         "dc01" : {
-            "hostname" : "testercomp",
+            "hostname" : "progcomp",
             "type" : "dc",
             "local_admin_password": "8dCT-DJjgScp",
             "domain" : "programmers.kzi",
@@ -25,26 +25,8 @@
                 "account_is_sensitive" : { "renly": {"account" : "renly.baratheon"} }
             }
         },
-        "ws01" : {
-            "hostname" : "casterlyrock",
-            "type" : "workstation",
-            "local_admin_password": "EP+xh7Rk6j90",
-            "domain" : "programmers.kzi",
-            "path" : "DC=programmers,DC=kzi",
-            "local_groups" : {
-                "Administrators" : [
-                    "programmers\\tywin.lannister",
-                    "programmers\\jaime.lannister"
-                ]
-            },
-            "Remote Desktop Users" : [
-                "programmers\\Lanister"
-            ],
-            "scripts" : [],
-            "vulns" : ["disable_firewall"]
-        },
         "dc02" : {
-            "hostname" : "programmercomp",
+            "hostname" : "testercomp",
             "type" : "dc",
             "local_admin_password": "NgtI75cKV+Pu",
             "domain" : "testers.programmers.kzi",
@@ -66,8 +48,7 @@
                 "ntlm_relay.ps1",
                 "responder.ps1",
                 "gpo_abuse.ps1",
-                "rdp_scheduler.ps1",
-                "unconstrained_delegation_user.ps1"
+                "rdp_scheduler.ps1"
             ],
             "vulns" : ["disable_firewall","directory", "credentials", "autologon", "files", "enable_llmnr", "enable_nbt-ns", "shares"],
             "vulns_vars" : {
@@ -75,7 +56,7 @@
                     "setup": "c:\\setup"
                 },
                 "credentials" : {
-                    "TERMSRV/programmerserver": {
+                    "TERMSRV/testerserver": {
                         "username" : "testers\\robb.stark",
                         "secret"   : "sexywolfy",
                         "runas"    : "testers\\robb.stark",
@@ -105,7 +86,7 @@
             }
         },
         "srv02" : {
-            "hostname" : "programmerserver",
+            "hostname" : "testerserver",
             "type" : "server",
             "local_admin_password": "NgtI75cKV+Pu",
             "domain" : "testers.programmers.kzi",
@@ -224,8 +205,8 @@
                 },
                 "executeasuser" : {},
                 "linked_servers": {
-                    "programmerserver" : {
-                        "data_src": "programmerserver.testers.programmers.kzi",
+                    "testerserver" : {
+                        "data_src": "testerserver.testers.programmers.kzi",
                         "users_mapping": [
                             {"local_login": "admins\\khal.drogo","remote_login": "sa", "remote_password": "Sup1_sa_P@ssw0rd!"}
                         ]
@@ -417,7 +398,7 @@
                     "firstname"   : "Arya",
                     "surname"     : "Stark",
                     "password"    : "Needle",
-                    "city"        : "programmercomp",
+                    "city"        : "testercomp",
                     "description" : "Arya Stark",
                     "groups"      : ["Stark"],
                     "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
@@ -444,7 +425,7 @@
                     "firstname"   : "Robb",
                     "surname"     : "Stark",
                     "password"    : "sexywolfy",
-                    "city"        : "programmercomp",
+                    "city"        : "testercomp",
                     "description" : "Robb Stark",
                     "groups"      : ["Stark"],
                     "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
@@ -453,7 +434,7 @@
                     "firstname"   : "Sansa",
                     "surname"     : "Stark",
                     "password"    : "345ertdfg",
-                    "city"        : "programmercomp",
+                    "city"        : "testercomp",
                     "description" : "Sansa Stark",
                     "groups"      : ["Stark"],
                     "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi",
@@ -463,7 +444,7 @@
                     "firstname"   : "Brandon",
                     "surname"     : "Stark",
                     "password"    : "iseedeadpeople",
-                    "city"        : "programmercomp",
+                    "city"        : "testercomp",
                     "description" : "Brandon Stark",
                     "groups"      : ["Stark"],
                     "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
@@ -472,7 +453,7 @@
                     "firstname"   : "Rickon",
                     "surname"     : "Stark",
                     "password"    : "Winter2022",
-                    "city"        : "programmercomp",
+                    "city"        : "testercomp",
                     "description" : "Rickon Stark",
                     "groups"      : ["Stark"],
                     "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
@@ -481,7 +462,7 @@
                     "firstname"   : "hodor",
                     "surname"     : "hodor",
                     "password"    : "hodor",
-                    "city"        : "programmercomp",
+                    "city"        : "testercomp",
                     "description" : "Brainless Giant",
                     "groups"      : ["Stark"],
                     "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi"
@@ -522,7 +503,7 @@
                     "description" : "sql service",
                     "groups"      : [],
                     "path"        : "CN=Users,DC=testers,DC=programmers,DC=kzi",
-                    "spns"        : ["MSSQLSvc/programmerserver.testers.programmers.kzi:1433","MSSQLSvc/programmerserver.testers.programmers.kzi"]
+                    "spns"        : ["MSSQLSvc/testerserver.testers.programmers.kzi:1433","MSSQLSvc/testerserver.testers.programmers.kzi"]
                 }
             }
         },
@@ -585,8 +566,8 @@
                 "addmember_smallcouncil_DragonStone" : {"for": "Small Council", "to": "DragonStone", "right": "Ext-Write-Self-Membership", "inheritance": "All"},
                 "write_owner_dragonstone_kingsguard" : {"for": "DragonStone", "to": "KingsGuard", "right": "WriteOwner", "inheritance": "None"},
                 "GenericAll_kingsguard_stanis" : {"for": "KingsGuard", "to": "stannis.baratheon", "right": "GenericAll", "inheritance": "None"},
-                "GenericAll_stanis_dc" : {"for": "stannis.baratheon", "to": "testercomp$", "right": "GenericAll", "inheritance": "None"},
-                "GenericAll_group_acrrosdom_dc" : {"for": "AcrossTheNarrowSea", "to": "testercomp$", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_stanis_dc" : {"for": "stannis.baratheon", "to": "progcomp$", "right": "GenericAll", "inheritance": "None"},
+                "GenericAll_group_acrrosdom_dc" : {"for": "AcrossTheNarrowSea", "to": "progcomp$", "right": "GenericAll", "inheritance": "None"},
                 "GenericAll_varys_domadmin" : {"for": "lord.varys", "to": "Domain Admins", "right": "GenericAll", "inheritance": "None"},
                 "GenericAll_varys_domadmin_holder" : {"for": "lord.varys", "to": "CN=AdminSDHolder,CN=System,DC=programmers,DC=kzi", "right": "GenericAll", "inheritance": "None"},
                 "WriteDACL_renly_Crownlands" : {"for": "renly.baratheon", "to": "OU=Crownlands,DC=programmers,DC=kzi", "right": "WriteDacl", "inheritance": "None"}
